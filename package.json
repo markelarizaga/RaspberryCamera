@@ -1,0 +1,30 @@
+{
+  "name": "RaspberryCamera",
+  "description": "A Node.js-based application to use Raspberry Pi's camera to take photos and videos remotely",
+  "version": "0.0.0",
+  "homepage": "",
+  "author": {
+    "name": "Markel Arizaga <markel.arizaga@gmail.com>",
+    "email": "markel.arizaga@gmail.com"
+  },
+  "keywords": [
+    "raspberry pi", "camera", "raspicam", "node"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "",
+      "url": ""
+    }
+  ],
+  "dependencies": {
+    "express": "3.x",
+    "raspicam": "*"
+  }
+}
