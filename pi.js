@@ -54,7 +54,7 @@ camera.configureFor = function (option) {
 app.get('/photo', function(req, res){
 	camera.configureFor("photo");
 	//listen for the "read" event triggered when each new photo/video is saved
-	camera.on("read", function(err, filename){ 
+	camera.on("read", function(err, date, filename){ 
 		if (err) {
 			throw err;
 		}
@@ -72,7 +72,7 @@ app.get('/photo', function(req, res){
 app.get('/video', function(req, res){
 	camera.configureFor("video");
 	//listen for the "read" event triggered when each new photo/video is saved
-	camera.on("exit", function(err, filename){ 
+	camera.on("exit", function(err, date, filename){ 
 		if (err) {
 			throw err;
 		}
