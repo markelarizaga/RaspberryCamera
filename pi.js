@@ -26,10 +26,7 @@ camera.configureFor = function (option) {
 				camera.set("mode", "photo");
 				changed = true;
 			}
-			if(camera.get("output") !== PHOTO_FOLDER + "picture.jpg") {
-				camera.set("output", PHOTO_FOLDER + "picture.jpg");
-				changed = true;
-			}
+			camera.set("output", PHOTO_FOLDER + new Date().getTime() + ".jpg");
 			break;
 		case cameraOptions.VIDEO:
 			if(camera.get("mode") !== cameraOptions.VIDEO){
@@ -54,16 +51,18 @@ camera.configureFor = function (option) {
 app.get('/photo', function(req, res){
 	camera.configureFor("photo");
 	//listen for the "read" event triggered when each new photo/video is saved
-	camera.on("read", function(err, date, filename){ 
+	camera.once("read", function(err, date, filename){ 
 		if (err) {
 			throw err;
 		}
+		console.log("Stoping camera");
 		camera.stop();
 		motionDetector.monitor();
 		res.write("200");
 		res.end();
 	});
 	if(motionDetector.isMonitoring()) {
+		console.log("Stoping monitor");
 		motionDetector.stopMonitoring();
 	}
 	camera.start();
@@ -92,6 +91,7 @@ app.listen(server.PORT, function() {
 });
 
 motionDetector.monitor(function(){
-	camera.configureFor("video");
+	console.log("Motion detected");
+	camera.configureFor("photo");
 	camera.start();
 });

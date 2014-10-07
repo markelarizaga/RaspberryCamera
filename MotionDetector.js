@@ -11,14 +11,17 @@ exports.monitor = function(motionDetectedCallback) {
 		["/home/pi/RaspberryCamera/app/scripts/picam.py"]
 	);
 	pythonProcess.stdout.on('data', function(data){
+		console.log("Standard data received");
 		IS_MONITORING = false;
 		if(motionDetectedCallback) {
 			motionDetectedCallback();
 		}
 	});
 	pythonProcess.on('close', function (code) { 
+		console.log("Process closed");
 	});
 	pythonProcess.stderr.on('data', function (data) {
+		console.log("Error data received");
 		IS_MONITORING = false;
 	});
 };
