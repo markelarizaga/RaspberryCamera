@@ -2,7 +2,7 @@ var childProcess = require('child_process').spawn;
 var pythonProcess = null;
 var IS_MONITORING = false;
 
-exports.monitor = function(motionDetectedCallback) {
+exports.start = function(motionDetectedCallback) {
 	console.log("Start monitoring");
 	IS_MONITORING = true;
 	pythonProcess = new childProcess(
@@ -26,8 +26,8 @@ exports.monitor = function(motionDetectedCallback) {
 	});
 };
 
-exports.stopMonitoring = function() {
-	console.log("Stopping monitorization");
+exports.stop = function() {
+	console.log("Stopping monitoring");
 	pythonProcess.kill();
 	IS_MONITORING = false;
 };

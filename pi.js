@@ -17,6 +17,12 @@ var VIDEO_FOLDER = "/home/pi/RaspberryCamera/videos/";
 var server = {
 	PORT : 3000
 };
+var RESTART_DELAY = 3000;
+
+function delayedStart (delay) {
+	console.log("STARTING WITH DELAY");
+	setTimeout(function(){camera.start();}, delay);
+}
 
 camera.configureFor = function (option) {
 	var changed = false;
@@ -50,48 +56,67 @@ camera.configureFor = function (option) {
 
 app.get('/photo', function(req, res){
 	camera.configureFor("photo");
-	//listen for the "read" event triggered when each new photo/video is saved
 	camera.once("read", function(err, date, filename){ 
 		if (err) {
 			throw err;
 		}
-		console.log("Stoping camera");
-		camera.stop();
-		motionDetector.monitor();
 		res.write("200");
 		res.end();
 	});
 	if(motionDetector.isMonitoring()) {
 		console.log("Stoping monitor");
-		motionDetector.stopMonitoring();
+		motionDetector.stop();
 	}
-	camera.start();
+	delayedStart(RESTART_DELAY);
 });
 
 app.get('/video', function(req, res){
 	camera.configureFor("video");
-	//listen for the "read" event triggered when each new photo/video is saved
+	camera.once("exit", function(err, date, filename){ 
+		if (err) {
+			throw err;
+		}
+		res.write("200");
+		res.end();
+	});
+	if(motionDetector.isMonitoring()) {
+		motionDetector.stop();
+	}
+	delayedStart(RESTART_DELAY);
+});
+
+function monitorCallback(){
+	console.log("Motion detected");
+	camera.configureFor("photo");
+	camera.start();
+}
+
+function setCameraCallbacks() {
+	//listen for the "read" event triggered when each new photo is saved
+	camera.on("read", function(err, date, filename){ 
+		if (err) {
+			throw err;
+		}
+		console.log("Stoping camera");
+		camera.stop();
+		setTimeout(startMonitoring, RESTART_DELAY);
+	});
+	//listen for the "exit" event triggered when each new video is saved
 	camera.on("exit", function(err, date, filename){ 
 		if (err) {
 			throw err;
 		}
 		camera.stop();
-		motionDetector.monitor();
-		res.write("200");
-		res.end();
+		setTimeout(startMonitoring, RESTART_DELAY);
 	});
-	if(motionDetector.isMonitoring()) {
-		motionDetector.stopMonitoring();
-	}
-	camera.start();
-});
+}
+
+function startMonitoring () {
+	motionDetector.start(monitorCallback);
+}
 
 app.listen(server.PORT, function() {
 	console.log('Listening on port ' + server.PORT);
-});
-
-motionDetector.monitor(function(){
-	console.log("Motion detected");
-	camera.configureFor("photo");
-	camera.start();
+	setCameraCallbacks();
+	startMonitoring();
 });
